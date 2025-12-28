@@ -1,31 +1,44 @@
-FROM php:8.2-cli
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libonig-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip gd
-
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Set working directory
+# ---- 1) deps Composer
+FROM composer:2 AS vendor
 WORKDIR /app
 
-# Copy project
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress
+
 COPY . .
+RUN composer dump-autoload --optimize
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# ---- 2) runtime PHP
+FROM php:8.2-cli-alpine
+WORKDIR /app
 
-# Expose port
+# Extensions utiles (mysql, pgsql, zip, etc.)
+RUN apk add --no-cache \
+    bash \
+    icu-dev \
+    libzip-dev \
+    oniguruma-dev \
+    && docker-php-ext-install \
+    intl \
+    mbstring \
+    zip \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql
+
+# Copie projet + vendors
+COPY --from=vendor /app /app
+
+# Permissions Laravel
+RUN mkdir -p storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
+
+# Script de démarrage
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV APP_ENV=production
+ENV LOG_CHANNEL=stderr
 EXPOSE 8000
 
-# Start Laravel from public/
-CMD php artisan migrate --force && php -S 0.0.0.0:8000 -t public
-
+CMD ["/entrypoint.sh"]
