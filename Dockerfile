@@ -12,7 +12,6 @@ RUN composer dump-autoload --optimize
 FROM php:8.2-cli-alpine
 WORKDIR /app
 
-# Extensions utiles (mysql, pgsql, zip, etc.)
 RUN apk add --no-cache \
     bash \
     icu-dev \
@@ -26,16 +25,16 @@ RUN apk add --no-cache \
     pdo_mysql \
     pdo_pgsql
 
-# Copie projet + vendors
 COPY --from=vendor /app /app
 
-# Permissions Laravel
 RUN mkdir -p storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
-# Script de démarrage
-COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Script de démarrage (CHEZ TOI il est à la racine)
+COPY entrypoint.sh /entrypoint.sh
+
+# Sécurité Windows CRLF -> LF (évite /bin/sh^M)
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 ENV APP_ENV=production
 ENV LOG_CHANNEL=stderr
