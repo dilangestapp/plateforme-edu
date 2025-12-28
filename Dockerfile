@@ -27,4 +27,5 @@ RUN composer install --no-dev --optimize-autoloader
 EXPOSE 8000
 
 # Start Laravel from public/
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+CMD php artisan migrate --force && php -S 0.0.0.0:8000 -t public
+
