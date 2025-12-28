@@ -19,3 +19,4 @@ php artisan view:clear || true
 php artisan migrate --force || true
 
 exec php -S 0.0.0.0:${PORT:-8000} -t public public/index.php
+
