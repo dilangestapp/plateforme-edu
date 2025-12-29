@@ -1,5 +1,8 @@
-.git
-node_modules
-vendor
-.env
-storage/logs
+cd /d C:\laragon\www\plateforme-edu
+(
+echo .git
+echo node_modules
+echo vendor
+echo .env
+echo storage/logs
+) > .dockerignore

@@ -1,12 +1,19 @@
-#!/bin/sh
-set -eu
-
-PORT="${PORT:-8080}"
-
-echo "[BOOT] start.sh running"
-echo "[BOOT] Listening on 0.0.0.0:${PORT}"
-
-mkdir -p storage bootstrap/cache || true
-chmod -R 775 storage bootstrap/cache || true
-
-exec php -S 0.0.0.0:"$PORT" -t public
+cd /d C:\laragon\www\plateforme-edu
+(
+echo #!/bin/sh
+echo set -eu
+echo.
+echo PORT="${PORT:-8080}"
+echo.
+echo echo "[BOOT] start.sh running"
+echo echo "[BOOT] Listening on 0.0.0.0:${PORT}"
+echo.
+echo mkdir -p storage bootstrap/cache ^|^| true
+echo chmod -R 775 storage bootstrap/cache ^|^| true
+echo.
+echo if [ -f artisan ]; then
+echo   php artisan package:discover --ansi ^|^| true
+echo fi
+echo.
+echo exec php -S 0.0.0.0:"$PORT" -t public
+) > start.sh
