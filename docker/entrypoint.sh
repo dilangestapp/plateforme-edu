@@ -1,22 +1,19 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
 
-cd /app
+HOST="0.0.0.0"
+PORT="${PORT:-8080}"
 
-# SQLite optionnel
-if [ "${DB_CONNECTION}" = "sqlite" ]; then
-  if [ -z "${DB_DATABASE}" ]; then
-    export DB_DATABASE=/tmp/database.sqlite
-  fi
-  mkdir -p /tmp
-  touch "${DB_DATABASE}"
+echo "Starting service on ${HOST}:${PORT}"
+
+# Si c'est un projet Laravel
+if [ -f artisan ]; then
+  # Nettoyage léger (ne bloque pas si ça échoue)
+  php artisan optimize:clear >/dev/null 2>&1 || true
+
+  # Démarrage Laravel (respecte $PORT)
+  exec php artisan serve --host="${HOST}" --port="${PORT}"
 fi
 
-php artisan config:clear || true
-php artisan route:clear || true
-php artisan view:clear || true
-
-php artisan migrate --force || true
-
-exec php -S 0.0.0.0:${PORT:-8000} -t public public/index.php
-
+# Sinon (app PHP simple avec dossier public/)
+exec php -S "${HOST}:${PORT}" -t public
