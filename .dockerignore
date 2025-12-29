@@ -1,8 +1,12 @@
 .git
 node_modules
-vendor
+.env
+
 storage/logs
 storage/framework/cache
 storage/framework/sessions
 storage/framework/views
-.env
+
+# Si tu utilises Vite et que tu as déjà build en local, tu peux garder public/build
+# sinon ne mets pas public/build ici.
+# public/build
