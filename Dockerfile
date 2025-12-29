@@ -18,4 +18,4 @@ ENV LOG_CHANNEL=stderr
 EXPOSE 8000
 
 # Railway fournit PORT, fallback 8000
-CMD ["sh", "-lc", "php artisan migrate --force && php -S 0.0.0.0:${PORT:-8000} -t public public/index.php"]
+CMD ["sh", "-lc", "php -S 0.0.0.0:$PORT -t public public/index.php"]
