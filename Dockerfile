@@ -1,7 +1,18 @@
 FROM composer:2 AS vendor
 WORKDIR /app
+
+# ✅ Evite GitHub API (psysh 504), force dist, et tolère les timeouts
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_DISABLE_NETWORK=0 \
+    COMPOSER_PROCESS_TIMEOUT=1200
+
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --prefer-dist --no-interaction --no-progress
+
+RUN composer config -g preferred-install dist \
+ && composer config -g github-protocols https \
+ && composer config -g secure-http true \
+ && composer install --no-dev --prefer-dist --no-interaction --no-progress
+
 COPY . .
 RUN composer dump-autoload --optimize
 
@@ -20,5 +31,4 @@ ENV APP_ENV=production
 ENV LOG_CHANNEL=stderr
 EXPOSE 8000
 
-# Pas d'entrypoint : Railway lance via Start Command
 CMD ["php", "-S", "0.0.0.0:8000", "-t", "public", "public/index.php"]
