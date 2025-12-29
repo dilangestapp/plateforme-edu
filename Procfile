@@ -1,1 +1,1 @@
-web: sh docker/entrypoint.sh
+web: sh start.sh
